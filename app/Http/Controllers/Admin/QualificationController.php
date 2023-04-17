@@ -11,6 +11,13 @@ use Illuminate\Support\Facades\Gate;
 
 class QualificationController extends Controller
 {
+    function __construct()
+    {
+         $this->middleware('permission:qualification-list|qualification-create|qualification-edit|qualification-delete', ['only' => ['index','store']]);
+         $this->middleware('permission:qualification-create', ['only' => ['create','store']]);
+         $this->middleware('permission:qualification-edit', ['only' => ['edit','update']]);
+         $this->middleware('permission:qualification-delete', ['only' => ['destroy']]);
+    }
      /**
      * Display a listing of the resource.
      *
@@ -18,7 +25,6 @@ class QualificationController extends Controller
      */
     public function index()
     {
-        Gate::authorize('all_qualification');
         $qualifications=Qualification::with('doctor')->paginate(10);
         return view('admin.qualification.index',compact('qualifications'));
     }
@@ -30,7 +36,6 @@ class QualificationController extends Controller
      */
     public function create()
     {
-        Gate::authorize('add_qualification');
         $doctors=Doctor::select('id','name')->get();
         return view('admin.qualification.create',compact('doctors'));
 
@@ -44,7 +49,6 @@ class QualificationController extends Controller
      */
     public function store(Request $request)
     {
-        Gate::authorize('add_qualification');
 
         $request->validate([
             'name'=>'required',
@@ -79,7 +83,7 @@ class QualificationController extends Controller
      */
     public function show($id)
     {
-        Gate::authorize('all_qualification');
+
     }
 
     /**
@@ -90,7 +94,6 @@ class QualificationController extends Controller
      */
     public function edit($id)
     {
-        Gate::authorize('edit_qualification');
         $doctors=Doctor::select('id','name')->get();
         $qualification=Qualification::find($id);
         return view('admin.qualification.edit',compact('qualification','doctors'));
@@ -105,7 +108,6 @@ class QualificationController extends Controller
      */
     public function update(Request $request, $id)
     {
-        Gate::authorize('edit_qualification');
         $qualification=Qualification::find($id);
         $request->validate([
             'name'=>'required',
@@ -144,7 +146,6 @@ class QualificationController extends Controller
      */
     public function destroy($id)
     {
-        Gate::authorize('delete_qualification');
 
         $qualification=Qualification::find($id);
         File::delete(public_path('image/qualifications/'.$qualification->image));
@@ -155,14 +156,12 @@ class QualificationController extends Controller
 
     public function trash()
     {
-        Gate::authorize('delete_qualification');
         $qualifications = Qualification::onlyTrashed()->paginate(10);
         return view('admin.qualification.trash', compact('qualifications'));
     }
 
     public function restore($id)
     {
-        Gate::authorize('delete_qualification');
         // Qualification::onlyTrashed()->find($id)->update(['deleted_at' => null]);
         Qualification::onlyTrashed()->find($id)->restore();
         return redirect()->route('admin.qualification.index')->with('msg', 'Qualification restored successfully')->with('type', 'warning');
@@ -170,7 +169,6 @@ class QualificationController extends Controller
 
     public function forcedelete($id)
     {
-        Gate::authorize('delete_qualification');
         Qualification::onlyTrashed()->find($id)->forcedelete();
         return redirect()->route('admin.qualification.index')->with('msg', 'Qualification deleted permanintly successfully')->with('type', 'danger');
     }

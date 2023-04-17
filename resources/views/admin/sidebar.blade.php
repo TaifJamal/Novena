@@ -20,8 +20,8 @@
     </li>
 
     <!-- About -->
-    @if (Gate::any(['add_about','all_about','delete_about','edit_about']))
-     <hr class="sidebar-divider">
+    @canany(['about-list','about-create','about-edit','about-delete'])
+        <hr class="sidebar-divider">
         <li class="nav-item">
             <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseclinet"
                 aria-expanded="true" aria-controls="collapseclinet">
@@ -37,10 +37,10 @@
                 </div>
             </div>
         </li>
-    @endif
+    @endcanany
 
     <!-- Award -->
-    @if (Gate::any(['add_award','all_award','delete_award','edit_award']))
+    @canany(['award-list','award-create','award-edit','award-delete'])
         <hr class="sidebar-divider d-none d-md-block">
         <li class="nav-item">
             <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseAward"
@@ -57,10 +57,10 @@
                 </div>
             </div>
         </li>
-    @endif
+    @endcanany
 
     <!-- Partner -->
-    @if (Gate::any(['add_partner','all_partner','delete_partner','edit_partner']))
+    @canany(['partner-list','partner-create','partner-edit','partner-delete'])
         <hr class="sidebar-divider d-none d-md-block">
         <li class="nav-item">
             <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsepartner"
@@ -76,10 +76,10 @@
                 </div>
             </div>
         </li>
-    @endif
+    @endcanany
 
-      <!-- Department -->
-    @if (Gate::any(['add_department','all_department','delete_department','edit_department']))
+   <!-- Department -->
+   @canany(['department-list','department-create','department-edit','department-delete'])
         <hr class="sidebar-divider d-none d-md-block">
 
         <li class="nav-item">
@@ -96,10 +96,11 @@
             </div>
         </div>
         </li>
-    @endif
+
+   @endcanany
 
     <!-- Doctor -->
-    @if (Gate::any(['add_doctor','all_doctor','delete_doctor','edit_doctor']))
+    @canany(['doctor-list','doctor-create','doctor-edit','doctor-delete'])
         <hr class="sidebar-divider d-none d-md-block">
         <li class="nav-item">
             <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseDepartmentDetail"
@@ -115,10 +116,10 @@
                 </div>
             </div>
         </li>
-    @endif
+    @endcanany
 
-      <!-- Feature -->
-      @if (Gate::any(['all_feature','add_feature','delete_feature','edit_feature']))
+    <!-- Feature -->
+    @canany(['feature-list','feature-create','feature-edit','feature-delete'])
         <hr class="sidebar-divider d-none d-md-block">
         <li class="nav-item">
             <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsefeature"
@@ -134,29 +135,29 @@
                 </div>
             </div>
         </li>
-      @endif
+    @endcanany
 
     <!-- Qualification -->
-    @if (Gate::any(['all_qualification','add_qualification','delete_qualification','edit_qualification']))
+    @canany(['qualification-list','qualification-create','qualification-edit','qualification-delete'])
         <hr class="sidebar-divider d-none d-md-block">
-            <li class="nav-item">
-                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseQualification"
-                    aria-expanded="true" aria-controls="collapseQualification">
-                    <i class="fas fa-users-cog"></i>
-                    <span>Qualification</span>
-                </a>
-                <div id="collapseQualification" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
-                    <div class="bg-white py-2 collapse-inner rounded">
-                        <a class="collapse-item" href="{{ route('admin.qualification.index') }}">all qualification</a>
-                        <a class="collapse-item" href="{{ route('admin.qualification.create') }}">add qualification</a>
-                        <a class="collapse-item" href="{{ route('admin.qualification.trash') }}">Trash</a>
-                    </div>
+        <li class="nav-item">
+            <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseQualification"
+                aria-expanded="true" aria-controls="collapseQualification">
+                <i class="fas fa-users-cog"></i>
+                <span>Qualification</span>
+            </a>
+            <div id="collapseQualification" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                <div class="bg-white py-2 collapse-inner rounded">
+                    <a class="collapse-item" href="{{ route('admin.qualification.index') }}">all qualification</a>
+                    <a class="collapse-item" href="{{ route('admin.qualification.create') }}">add qualification</a>
+                    <a class="collapse-item" href="{{ route('admin.qualification.trash') }}">Trash</a>
                 </div>
-            </li>
-    @endif
+            </div>
+        </li>
+    @endcanany
 
     <!-- Testimonial -->
-    @if (Gate::any(['all_testimonial','add_testimonial','delete_testimonial','edit_testimonial']))
+    @canany(['testimonial-list','testimonial-create','testimonial-edit','testimonial-delete'])
         <hr class="sidebar-divider d-none d-md-block">
         <li class="nav-item">
             <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseTestimonial"
@@ -172,21 +173,10 @@
                 </div>
             </div>
         </li>
-    @endif
+    @endcanany
 
-   <!-- Nav Item - User-->
-    @if (Gate::any(['all_user','delete_user']))
-        <hr class="sidebar-divider d-none d-md-block">
-            <li class="nav-item">
-                <a class="nav-link" href="{{ route('admin.user') }}">
-                    <i class="fas fa-fw fa-tachometer-alt"></i>
-                    <span>User</span></a>
-            </li>
-    @endif
-
-
-     <!-- Schedule -->
-     @if (Gate::any(['all_schedule','add_schedule','delete_schedule','edit_schedule']))
+    <!-- Schedule -->
+    @canany(['schedule-list','schedule-create','schedule-edit','schedule-delete'])
         <hr class="sidebar-divider d-none d-md-block">
         <li class="nav-item">
             <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseSchedule"
@@ -202,19 +192,43 @@
                 </div>
             </div>
         </li>
-     @endif
+    @endcanany
 
-
-    <!-- Roles -->
-    @if (Gate::any(['all_role','add_role','delete_role','edit_role']))
+    <!-- Role -->
+    @canany(['role-list','role-create','role-edit','role-delete'])
         <hr class="sidebar-divider d-none d-md-block">
         <li class="nav-item">
-            <a class="nav-link" href="{{ route('admin.role.index') }}">
-                <i class="fas fa-fw fa-tachometer-alt"></i>
-                <span>Roles</span></a>
+            <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseRole"
+                aria-expanded="true" aria-controls="collapseSchedule">
+                <i class="fas fa-users-cog"></i>
+                <span>Role</span>
+            </a>
+            <div id="collapseRole" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                <div class="bg-white py-2 collapse-inner rounded">
+                    <a class="collapse-item" href="{{ route('admin.roles.index') }}">all roles</a>
+                    <a class="collapse-item" href="{{ route('admin.roles.create') }}">add roles</a>
+                </div>
+            </div>
         </li>
-    @endif
+    @endcanany
 
+    <!-- User -->
+    @canany(['user-list','user-create','user-edit','user-delete'])
+        <hr class="sidebar-divider d-none d-md-block">
+        <li class="nav-item">
+            <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseUser"
+                aria-expanded="true" aria-controls="collapseSchedule">
+                <i class="fas fa-users-cog"></i>
+                <span>User</span>
+            </a>
+            <div id="collapseUser" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+                <div class="bg-white py-2 collapse-inner rounded">
+                    <a class="collapse-item" href="{{ route('admin.users.index') }}">all users</a>
+                    <a class="collapse-item" href="{{ route('admin.users.create') }}">add users</a>
+                </div>
+            </div>
+        </li>
+    @endcanany
 
     <hr class="sidebar-divider d-none d-md-block">
 

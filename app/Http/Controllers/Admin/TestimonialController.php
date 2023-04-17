@@ -11,6 +11,13 @@ use Illuminate\Support\Facades\Gate;
 
 class TestimonialController extends Controller
 {
+    function __construct()
+    {
+         $this->middleware('permission:testimonial-list|testimonial-create|testimonial-edit|testimonial-delete', ['only' => ['index','store']]);
+         $this->middleware('permission:testimonial-create', ['only' => ['create','store']]);
+         $this->middleware('permission:testimonial-edit', ['only' => ['edit','update']]);
+         $this->middleware('permission:testimonial-delete', ['only' => ['destroy']]);
+    }
 
      /**
      * Display a listing of the resource.
@@ -19,7 +26,6 @@ class TestimonialController extends Controller
      */
     public function index()
     {
-        Gate::authorize('all_testimonial');
         $testimonials=Testimonial::paginate(10);
         return view('admin.testimonial.index',compact('testimonials'));
     }
@@ -31,7 +37,6 @@ class TestimonialController extends Controller
      */
     public function create()
     {
-        Gate::authorize('add_testimonial');
         return view('admin.testimonial.create');
 
     }
@@ -44,7 +49,6 @@ class TestimonialController extends Controller
      */
     public function store(Request $request)
     {
-        Gate::authorize('add_testimonial');
         $request->validate([
             'name'=>'required',
             'smallDes'=>'required',
@@ -76,7 +80,7 @@ class TestimonialController extends Controller
      */
     public function show($id)
     {
-        Gate::authorize('all_testimonial');
+
     }
 
     /**
@@ -87,7 +91,6 @@ class TestimonialController extends Controller
      */
     public function edit($id)
     {
-        Gate::authorize('edit_testimonial');
         $testimonial=Testimonial::find($id);
         return view('admin.testimonial.edit',compact('testimonial'));
     }
@@ -101,7 +104,6 @@ class TestimonialController extends Controller
      */
     public function update(Request $request, $id)
     {
-        Gate::authorize('edit_testimonial');
 
         $testimonial=Testimonial::find($id);
         $request->validate([
@@ -138,7 +140,6 @@ class TestimonialController extends Controller
      */
     public function destroy($id)
     {
-        Gate::authorize('delete_testimonial');
         $testimonial=Testimonial::find($id);
         File::delete(public_path('image/testimonials/'.$testimonial->image));
         $testimonial->delete();
@@ -148,21 +149,18 @@ class TestimonialController extends Controller
 
     public function trash()
     {
-        Gate::authorize('delete_testimonial');
         $testimonials = Testimonial::onlyTrashed()->paginate(10);
         return view('admin.testimonial.trash', compact('testimonials'));
     }
 
     public function restore($id)
     {
-        Gate::authorize('delete_testimonial');
         Testimonial::onlyTrashed()->find($id)->restore();
         return redirect()->route('admin.testimonial.index')->with('msg', 'Testimonial restored successfully')->with('type', 'warning');
     }
 
     public function forcedelete($id)
     {
-        Gate::authorize('delete_testimonial');
         Testimonial::onlyTrashed()->find($id)->forcedelete();
         return redirect()->route('admin.testimonial.index')->with('msg', 'Testimonial deleted permanintly successfully')->with('type', 'danger');
     }

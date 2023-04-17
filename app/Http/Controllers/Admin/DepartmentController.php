@@ -11,6 +11,13 @@ use Illuminate\Support\Facades\Gate;
 
 class DepartmentController extends Controller
 {
+    function __construct()
+    {
+         $this->middleware('permission:department-list|department-create|department-edit|department-delete', ['only' => ['index','store']]);
+         $this->middleware('permission:department-create', ['only' => ['create','store']]);
+         $this->middleware('permission:department-edit', ['only' => ['edit','update']]);
+         $this->middleware('permission:department-delete', ['only' => ['destroy']]);
+    }
 
      /**
      * Display a listing of the resource.
@@ -19,7 +26,6 @@ class DepartmentController extends Controller
      */
     public function index()
     {
-        Gate::authorize('all_department');
         $departments=Department::paginate(10);
         return view('admin.department.index',compact('departments'));
     }
@@ -31,7 +37,6 @@ class DepartmentController extends Controller
      */
     public function create()
     {
-        Gate::authorize('add_department');
         $schedules=Schedule::all();
         return view('admin.department.create',compact('schedules'));
 
@@ -45,8 +50,6 @@ class DepartmentController extends Controller
      */
     public function store(Request $request)
     {
-        Gate::authorize('add_department');
-
         $request->validate([
             'name'=>'required',
             'content'=>'required',
@@ -78,7 +81,6 @@ class DepartmentController extends Controller
      */
     public function show($id)
     {
-        Gate::authorize('all_department');
         $department= Department::find($id);
         $schedules = $department->schedules;
         return view('admin.department.show',compact('schedules'));
@@ -92,7 +94,6 @@ class DepartmentController extends Controller
      */
     public function edit($id)
     {
-        Gate::authorize('edit_department');
         $schedules = Schedule::all();
         $department=Department::find($id);
         return view('admin.department.edit',compact('department','schedules'));
@@ -107,8 +108,6 @@ class DepartmentController extends Controller
      */
     public function update(Request $request, $id)
     {
-        Gate::authorize('edit_department');
-
         $department=Department::find($id);
         $request->validate([
             'name'=>'required',
@@ -146,7 +145,6 @@ class DepartmentController extends Controller
      */
     public function destroy($id)
     {
-        Gate::authorize('delete_department');
         $department=Department::find($id);
         File::delete(public_path('image/departments/'.$department->image));
         $department->delete();
@@ -156,21 +154,18 @@ class DepartmentController extends Controller
 
     public function trash()
     {
-        Gate::authorize('delete_department');
         $departments = Department::onlyTrashed()->paginate(10);
         return view('admin.department.trash', compact('departments'));
     }
 
     public function restore($id)
     {
-        Gate::authorize('delete_department');
         Department::onlyTrashed()->find($id)->restore();
         return redirect()->route('admin.department.index')->with('msg', 'Department restored successfully')->with('type', 'warning');
     }
 
     public function forcedelete($id)
     {
-        Gate::authorize('delete_department');
         Department::onlyTrashed()->find($id)->forcedelete();
         return redirect()->route('admin.department.index')->with('msg', 'Department deleted permanintly successfully')->with('type', 'danger');
     }

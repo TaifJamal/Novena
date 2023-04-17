@@ -11,6 +11,13 @@ use Illuminate\Support\Facades\Gate;
 
 class FeatureController extends Controller
 {
+    function __construct()
+    {
+         $this->middleware('permission:feature-list|feature-create|feature-edit|feature-delete', ['only' => ['index','store']]);
+         $this->middleware('permission:feature-create', ['only' => ['create','store']]);
+         $this->middleware('permission:feature-edit', ['only' => ['edit','update']]);
+         $this->middleware('permission:feature-delete', ['only' => ['destroy']]);
+    }
     /**
     * Display a listing of the resource.
     *
@@ -18,7 +25,6 @@ class FeatureController extends Controller
     */
    public function index()
    {
-       Gate::authorize('all_feature');
        $features=Feature::with('department','doctor')->paginate(10);
        return view('admin.feature.index',compact('features'));
    }
@@ -30,7 +36,6 @@ class FeatureController extends Controller
     */
    public function create()
    {
-      Gate::authorize('add_feature');
        $departments=Department::select('id','name')->get();
        $doctors=Doctor::select('id','name')->get();
        return view('admin.feature.create',compact('departments','doctors'));
@@ -45,7 +50,6 @@ class FeatureController extends Controller
     */
    public function store(Request $request)
    {
-    Gate::authorize('add_feature');
        $request->validate([
            'content'=>'required',
            'type'=>'required',
@@ -70,7 +74,7 @@ class FeatureController extends Controller
     */
    public function show($id)
    {
-     Gate::authorize('all_feature');
+
    }
 
    /**
@@ -81,7 +85,6 @@ class FeatureController extends Controller
     */
    public function edit($id)
    {
-      Gate::authorize('edit_feature');
        $departments=Department::select('id','name')->get();
        $doctors=Doctor::select('id','name')->get();
        $feature=Feature::find($id);
@@ -97,7 +100,6 @@ class FeatureController extends Controller
     */
    public function update(Request $request, $id)
    {
-      Gate::authorize('edit_feature');
        $feature=Feature::find($id);
        $request->validate([
         'content'=>'required',
@@ -121,7 +123,6 @@ class FeatureController extends Controller
     */
    public function destroy($id)
    {
-      Gate::authorize('delete_feature');
        Feature::destroy($id);
        return redirect()->route('admin.feature.index')->
        with('msg', 'Feature delete successfully')->with('type', 'success');
@@ -129,21 +130,18 @@ class FeatureController extends Controller
 
    public function trash()
    {
-       Gate::authorize('delete_feature');
        $features = Feature::onlyTrashed()->paginate(10);
        return view('admin.feature.trash', compact('features'));
    }
 
    public function restore($id)
    {
-       Gate::authorize('delete_feature');
        Feature::onlyTrashed()->find($id)->restore();
        return redirect()->route('admin.feature.index')->with('msg', 'Feature restored successfully')->with('type', 'warning');
    }
 
    public function forcedelete($id)
    {
-       Gate::authorize('delete_feature');
        Feature::onlyTrashed()->find($id)->forcedelete();
        return redirect()->route('admin.feature.index')->with('msg', 'Feature deleted permanintly successfully')->with('type', 'danger');
    }

@@ -3,6 +3,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Site\SiteController;
 use App\Http\Controllers\Admin\RoleController;
+use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\AboutController;
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\AwardController;
@@ -74,8 +75,9 @@ Route::prefix('admin')->name('admin.')->middleware('auth','check_user')->group(f
     Route::delete('schedule/{id}/forcedelete', [ScheduleController::class, 'forcedelete'])->name('schedule.forcedelete');
     Route::resource('schedule',ScheduleController::class);
 
-    //Role
-    Route::resource('role',RoleController::class);
+    Route::resource('roles', RoleController::class);
+    Route::resource('users', UserController::class);
+
 
 });
 

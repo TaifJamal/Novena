@@ -9,6 +9,13 @@ use Illuminate\Support\Facades\Gate;
 
 class AwardController extends Controller
 {
+    function __construct()
+    {
+         $this->middleware('permission:award-list|award-create|award-edit|award-delete', ['only' => ['index','store']]);
+         $this->middleware('permission:award-create', ['only' => ['create','store']]);
+         $this->middleware('permission:award-edit', ['only' => ['edit','update']]);
+         $this->middleware('permission:award-delete', ['only' => ['destroy']]);
+    }
       /**
      * Display a listing of the resource.
      *
@@ -16,7 +23,6 @@ class AwardController extends Controller
      */
     public function index()
     {
-        Gate::authorize('all_award');
         $awards=Award::paginate(10);
         return view('admin.award.index',compact('awards'));
     }
@@ -28,7 +34,6 @@ class AwardController extends Controller
      */
     public function create()
     {
-        Gate::authorize('add_award');
         return view('admin.award.create');
 
     }
@@ -41,7 +46,6 @@ class AwardController extends Controller
      */
     public function store(Request $request)
     {
-        Gate::authorize('add_award');
         $request->validate([
             'name'=>'required',
             'icon'=>'required',
@@ -75,7 +79,6 @@ class AwardController extends Controller
      */
     public function edit($id)
     {
-        Gate::authorize('edit_award');
         $award=Award::find($id);
         return view('admin.award.edit',compact('award'));
     }
@@ -89,7 +92,6 @@ class AwardController extends Controller
      */
     public function update(Request $request, $id)
     {
-        Gate::authorize('edit_award');
         $award=Award::find($id);
         $request->validate([
             'name'=>'required',
@@ -115,8 +117,6 @@ class AwardController extends Controller
      */
     public function destroy($id)
     {
-        Gate::authorize('delete_award');
-
         Award::destroy($id);
         return redirect()->route('admin.award.index')->
         with('msg', 'Award delete successfully')->with('type', 'success');
@@ -124,14 +124,12 @@ class AwardController extends Controller
 
     public function trash()
     {
-        Gate::authorize('delete_award');
         $awards = Award::onlyTrashed()->paginate(10);
         return view('admin.award.trash', compact('awards'));
     }
 
     public function restore($id)
     {
-        Gate::authorize('delete_award');
         Award::onlyTrashed()->find($id)->restore();
         return redirect()->route('admin.award.index')->with('msg', 'Award restored successfully')->with('type', 'warning');
     }

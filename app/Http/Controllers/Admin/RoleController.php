@@ -2,37 +2,42 @@
 
 namespace App\Http\Controllers\Admin;
 
-use App\Models\Role;
-use App\Models\Ability;
+
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Spatie\Permission\Models\Role;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Gate;
+use Spatie\Permission\Models\Permission;
 
 class RoleController extends Controller
 {
-      /**
+    /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
+    function __construct()
+    {
+         $this->middleware('permission:role-list|role-create|role-edit|role-delete', ['only' => ['index','store']]);
+         $this->middleware('permission:role-create', ['only' => ['create','store']]);
+         $this->middleware('permission:role-edit', ['only' => ['edit','update']]);
+         $this->middleware('permission:role-delete', ['only' => ['destroy']]);
+    }
     public function index()
     {
-        Gate::authorize('all_role');
-       $roles =Role::paginate(10);
-       return view('Role.index',compact('roles'));
+        $roles=Role::all();
+        return view('admin.roles.index',compact('roles'));
     }
 
-    /**
+    /**+
      * Show the form for creating a new resource.
      *
      * @return \Illuminate\Http\Response
      */
     public function create()
     {
-      Gate::authorize('add_role');
-      $abitities=Ability::all();
-      return view('Role.create',compact('abitities'));
-
+        $permissions = Permission::get();
+        return view('admin.roles.create',compact('permissions'));
     }
 
     /**
@@ -43,18 +48,20 @@ class RoleController extends Controller
      */
     public function store(Request $request)
     {
-        Gate::authorize('add_role');
+
+
         $request->validate([
             'name'=>'required',
+            'permission'=>'required',
         ]);
-       $role=Role::create([
+
+        $role=Role::create([
             'name'=>$request->name,
         ]);
-        $role->abilities()->attach( $request->ability);
+        $role->syncPermissions( $request->permission);
 
-        return redirect()->route('admin.role.index')->
-        with('msg', 'Role added successfully')->with('type', 'success');
-
+        // Redirect
+        return redirect()->route('admin.roles.index')->with('msg', 'Role added successfully')->with('type', 'success');
     }
 
 
@@ -66,7 +73,7 @@ class RoleController extends Controller
      */
     public function show($id)
     {
-        Gate::authorize('all_role');
+        //
     }
 
     /**
@@ -77,10 +84,11 @@ class RoleController extends Controller
      */
     public function edit($id)
     {
-      Gate::authorize('edit_role');
-      $role =Role::find($id);
-      $abitities=Ability::all();
-      return view('Role.edit',compact('abitities','role'));
+        $role=Role::find($id);
+        $permissions = Permission::get();
+        // $rolePermissions=DB::table('role_has_permissions')->where('role_id',$id)->pluck('permission_id')->all();
+        $rolePermissions= $role->permissions->pluck('id')->all();
+        return view('admin.roles.edit',compact('role','permissions','rolePermissions'));
     }
 
     /**
@@ -92,18 +100,21 @@ class RoleController extends Controller
      */
     public function update(Request $request, $id)
     {
-        Gate::authorize('edit_role');
-        $role =Role::find($id);
+        $role=Role::find($id);
+
         $request->validate([
             'name'=>'required',
+            'permission'=>'required',
         ]);
-       $role->update([
+
+        $role->update([
             'name'=>$request->name,
         ]);
-        $role->abilities()->sync( $request->ability);
 
-        return redirect()->route('admin.role.index')->
-        with('msg', 'Role update successfully')->with('type', 'success');
+
+        $role->syncPermissions( $request->permission);
+          // Redirect
+        return redirect()->route('admin.roles.index')->with('msg', 'Role updated successfully')->with('type', 'info');
 
     }
 
@@ -115,12 +126,10 @@ class RoleController extends Controller
      */
     public function destroy($id)
     {
-        Gate::authorize('delete_role');
-      $role =Role::find($id);
-      $role->delete();
-
-      return redirect()->route('admin.role.index')->
-      with('msg', 'Role delete successfully')->with('type', 'success');
+        $role=Role::find($id);
+        $role->delete();
+        // Redirect
+        return redirect()->route('admin.roles.index')->with('msg', 'Role deleted successfully')->with('type', 'danger');
     }
 
 
